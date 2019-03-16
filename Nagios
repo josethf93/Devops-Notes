@@ -1,0 +1,370 @@
+
+installation of nagios
+
+Please download nagios from 
+
+https://www.nagios.com/downloads/nagios-xi/microsoft/
+
+
+Please download virtual box from 
+
+https://www.virtualbox.org/wiki/Downloads
+
+in this page select windows hosts 
+
+
+CEDENTIALS for command line  - nagios command line termn	
+
+credentials for nagios -- nagios xi - GUI -- separate credentails 
+
+
+
+nagiosadmin -username for GUI
+
+password - while running for the first time , you will get it  
+
+
+
+
+
+
+why we need system monitoring 
+
+intro of nagios
+
+object 
+
+object type 
+
+how to install server nagios 
+
+if you wanna reset , go inside /usr/local/nagiosxi
+
+resetnagiospassword = newpassword
+
+how to configure 
+
+
+two types 
+
+infa monitoring 
+
+application monitoring ( different ball game)
+
+define SLA by using nagios 
+
+example of continous monitoring 
+
+do i need to check cross browser compatibility 
+
+artificial thinking , pattern in logs 
+
+take preventive factors
+
+what is acceptable and what is not acceptable 
+
+these tools help us resolve any system erros 
+low memory per say 
+
+
+so we can prevent impact on productivity
+
+will detect network / server problems
+
+determines the root cause
+
+maintains secuity and availability 
+
+it monitors and troubleshoot server performance issues
+
+these provide basic rudimentary checking
+
+nagios scheduler will run as daemon is background
+
+checks at regular intervals
+
+ps -ef | grep nagios
+
+we have -d which is daemon
+
+and workers as well
+
+nagios remote plugin execution
+
+notification commands
+
+four types of status check
+
+ok warning critical and unknows
+
+attempt 4/4 ( critical )
+
+we have to mark the implications very carefully 
+
+
+1/4(critical) , 2/4(critical) , 3/4(critical) , 4/4 (ok)
+
+3 times it failed , 4th connected but this should be avoided
+
+as you are more vulnerable for risk 
+
+
+please assess at the first time itself
+
+
+
+ac attemped count< mca (max checked attempts )
+
+lets not blame nagios , for example 
+
+1 hour is the interval check and 24 is MCA
+
+now , 5 o clock u left office , you will never get to know 
+
+till next day 5 o clock . because interval time is 1 hour 
+
+and max attempts is 24 which means 24 hours your system is down
+
+
+usr /local/nagios /libexec (here we have all plugins installed)
+
+we have perl plugin and non perl plugin
+
+for example on plugin 
+
+./check_ssh 192.168.1.11
+
+it replies ssh ok 
+
+./check_ssh nagios.demo.com
+
+it replies ssh ok
+
+the same thing we see inside the nagios 
+
+one more example 
+
+./check_users -w 1 -c 2 (1 means ok , 2 means critical)
+
+the above says ok
+
+./check_users -w 0 -c 1 
+
+the above is warning , as we set limit if more than 0 throw warning
+
+./check_users -w 0 -c 0 
+
+the above says critical 
+
+and if i print echo$? it says 2 (2 means critical )
+
+./check_users -w 0 -c 1
+
+if i print echo$? it says 1 ( warning) 
+
+
+./check_users -w 2 -c 5
+
+if i print echo$? it says 0 ( ok)
+
+values for the states are as follows 
+
+0 -ok
+1- warning
+2- critical 
+3- unknown
+the above is for currently logged in users
+
+
+for customized plugins , we have the following command for plugin
+
+./check_tcp -H 192.168.1.10 -p 80 -w 0.05 -c 0.01
+
+
+tcp ok  
+
+
+echo$? says 0
+
+./check_uptime 
+
+uptime ok
+
+
+
+objects
+------
+
+/usr/local/nagios/etc
+
+vi nagios.cfg
+
+this has 
+
+cfg_file=/usr/local/nagios/etc/objects/servers.cfg
+
+cfg_dir/usr/local/nagios/etc/servers  ( here i came group all files together
+
+and keep them here in this directory)
+
+ex : one for prod , dev , qa etc
+
+
+one of those files for contacts is 
+
+cfg_file=/usr/local/nagios/etc/objects/users.cfg
+
+in this define contactgroup
+
+members we can edit , nagiosadmin nagiosadmin2
+
+templates.cfg
+
+search for generic inside this file
+
+24x7 ( default)
+
+flapping up and down --
+
+for such things we can define notify service by email
+
+service_notification_period - workdays (only weekdays) (contacts.cfg)
+
+this timeperiod can be changed in timeperiods.cfg
+
+u can change here 
+
+like 
+
+timeperiodname_24x7
+
+workhours
+
+monday 
+
+tuesday ...etc...
+
+define work hours here
+
+like 8 to 6 etc .
+
+
+similarly 
+
+holiday list can be defined as follows
+
+
+january1   00:00-00:00:00 ; NewYearsDay  ( zero time means no time so
+
+that denotes as holiday)
+
+
+classic example is like as follows
+
+for production servers i will configure email 24x7 
+
+and for dev and qa server i will configure (holidays , weekends excluded)
+
+hosts
+
+define host {
+
+linux-server
+
+template definition
+
+we can grop servers 
+
+in define hostgroup {
+
+dev servers one group ..etc
+
+commands.cfg 
+
+define command {
+
+$HOSTNAME 
+
+for ex: 192.15.4.4 
+
+the same alert is printed here as sorry 192.15 is down
+
+
+services.cfg
+
+what should be the notification ( where the service applicable to)
+
+define service 
+
+check_ping !100.0,20%
+
+this will call command.cfg 
+
+in this 
+
+we can check_ping -H $HOSTNAME -w 3000 -c $ARG$
+
+
+on the server side
+
+we need to add in commands.cfg
+
+define command {
+command_name check_nrpe
+command_line $USER1$/check_nrpe -H $HOSTADDRESS -c $ARG1$
+
+the above enables nrpe
+
+--
+
+nagios notification 
+
+we have to enable the notification filter
+
+etc flapping can be notified etc ..
+
+installation 
+
+of ubuntu
+
+INSTALL_Nagios_Ubuntu_14.txt 
+
+
+./check_http -I 192.168.1.11 -p 8080
+
+
+just to check if everything is working fine 
+
+now 
+
+vi command.cfg
+
+check nrpe
+
+vi servers.cfg
+
+host definition
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+fsd
+
+
+
+nagios.txt
+Displaying nagios.txt.
